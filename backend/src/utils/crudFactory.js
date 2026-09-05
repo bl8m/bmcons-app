@@ -8,9 +8,12 @@ import { ApiError } from './ApiError.js';
 // req.resourceFilter, se presente (impostato da middleware come
 // scopeToOwnCustomer), viene unito ai filtri di lettura/scrittura per
 // limitare l'accesso ai soli record di competenza dell'utente.
-export function createCrudHandlers(Model, { entityName = 'Elemento' } = {}) {
+//
+// sort: ordinamento della lista, di default per data di creazione più
+// recente; può essere personalizzato (es. le rate mutuo per scadenza).
+export function createCrudHandlers(Model, { entityName = 'Elemento', sort = { createdAt: -1 } } = {}) {
   const list = asyncHandler(async (req, res) => {
-    const items = await Model.find(req.resourceFilter ?? {}).sort({ createdAt: -1 });
+    const items = await Model.find(req.resourceFilter ?? {}).sort(sort);
     res.json({ items });
   });
 

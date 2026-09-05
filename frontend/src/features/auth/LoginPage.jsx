@@ -5,6 +5,7 @@ import { useAuthStore } from './authStore.js';
 import Input from '../../components/Input.jsx';
 import Button from '../../components/Button.jsx';
 import Card from '../../components/Card.jsx';
+import logo from '../../assets/images/bmcons-logo.png';
 
 export default function LoginPage() {
   const login = useAuthStore((state) => state.login);
@@ -29,7 +30,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gray-50 px-4">
+      <img src={logo} alt="BM Cons" className="h-20 w-20 object-contain" />
+
       <Card className="w-full max-w-sm">
         <h1 className="mb-6 text-xl font-semibold text-text-dark">Accedi</h1>
 

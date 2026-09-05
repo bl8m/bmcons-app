@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Tabs from '../../components/Tabs.jsx';
 import CustomerForm from './CustomerForm.jsx';
-import CustomerRelatedResourceTab from './CustomerRelatedResourceTab.jsx';
+import ScopedResourceTab from '../../components/ScopedResourceTab.jsx';
 import AddressForm from '../addresses/AddressForm.jsx';
 import { addressesApi } from '../addresses/addressesApi.js';
 import PhoneForm from '../phones/PhoneForm.jsx';
@@ -54,8 +54,9 @@ export default function CustomerFormWithTabs(props) {
       )}
 
       {activeTab === 'addresses' && (
-        <CustomerRelatedResourceTab
-          customerId={customerId}
+        <ScopedResourceTab
+          scopeField="customerId"
+          scopeValue={customerId}
           resourceApi={addressesApi}
           FormComponent={AddressForm}
           newButtonLabel="Nuovo indirizzo"
@@ -70,8 +71,9 @@ export default function CustomerFormWithTabs(props) {
       )}
 
       {activeTab === 'phones' && (
-        <CustomerRelatedResourceTab
-          customerId={customerId}
+        <ScopedResourceTab
+          scopeField="customerId"
+          scopeValue={customerId}
           resourceApi={phonesApi}
           FormComponent={PhoneForm}
           newButtonLabel="Nuovo telefono"
@@ -85,8 +87,9 @@ export default function CustomerFormWithTabs(props) {
       )}
 
       {activeTab === 'emails' && (
-        <CustomerRelatedResourceTab
-          customerId={customerId}
+        <ScopedResourceTab
+          scopeField="customerId"
+          scopeValue={customerId}
           resourceApi={emailAddressesApi}
           FormComponent={EmailAddressForm}
           newButtonLabel="Nuova email"
@@ -100,8 +103,9 @@ export default function CustomerFormWithTabs(props) {
       )}
 
       {activeTab === 'bankAccounts' && (
-        <CustomerRelatedResourceTab
-          customerId={customerId}
+        <ScopedResourceTab
+          scopeField="customerId"
+          scopeValue={customerId}
           resourceApi={bankAccountsApi}
           FormComponent={BankAccountForm}
           formProps={{ banks }}

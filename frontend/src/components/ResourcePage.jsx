@@ -21,6 +21,9 @@ import ConfirmDialog from './ConfirmDialog.jsx';
 // - embedded: se true, non incapsula il contenuto in una Card (usato quando
 //   la lista è già incorporata in un altro contenitore, es. una tab)
 // - modalSize: dimensione della modale di creazione/modifica (vedi Modal.jsx)
+// - readOnly: se true, nasconde "Nuovo"/"Modifica"/"Elimina" e mostra solo
+//   l'elenco (usato per l'accesso in sola lettura del customer a dati che
+//   gestisce solo l'amministratore, es. Mutui e Rate)
 export default function ResourcePage({
   title,
   api,
@@ -34,6 +37,7 @@ export default function ResourcePage({
   emptyMessage = 'Nessun elemento presente.',
   embedded = false,
   modalSize = 'md',
+  readOnly = false,
 }) {
   const [items, setItems] = useState(null);
   const [loadError, setLoadError] = useState(null);
@@ -94,15 +98,17 @@ export default function ResourcePage({
     <>
       <div className="mb-4 flex items-center justify-between">
         {title && <h1 className="text-lg font-semibold text-text-dark">{title}</h1>}
-        <Button
-          className={title ? '' : 'ml-auto'}
-          onClick={() => {
-            setFormError(null);
-            setFormState({ mode: 'create' });
-          }}
-        >
-          {newButtonLabel}
-        </Button>
+        {!readOnly && (
+          <Button
+            className={title ? '' : 'ml-auto'}
+            onClick={() => {
+              setFormError(null);
+              setFormState({ mode: 'create' });
+            }}
+          >
+            {newButtonLabel}
+          </Button>
+        )}
       </div>
 
       {loadError && <p className="mb-2 text-sm text-red-600">{loadError}</p>}
@@ -119,7 +125,7 @@ export default function ResourcePage({
                     {col.label}
                   </th>
                 ))}
-                <th className="py-2 text-right">Azioni</th>
+                {!readOnly && <th className="py-2 text-right">Azioni</th>}
               </tr>
             </thead>
             <tbody>
@@ -130,29 +136,31 @@ export default function ResourcePage({
                       {col.render ? col.render(item) : (item[col.key] ?? '—')}
                     </td>
                   ))}
-                  <td className="py-2">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="secondary"
-                        className="px-3 py-1 text-xs"
-                        onClick={() => {
-                          setFormError(null);
-                          setFormState({ mode: 'edit', item });
-                        }}
-                      >
-                        Modifica
-                      </Button>
-                      <Button
-                        variant="danger"
-                        className="px-3 py-1 text-xs"
-                        disabled={!canDelete(item)}
-                        title={!canDelete(item) ? deleteDisabledTitle?.(item) : undefined}
-                        onClick={() => setItemToDelete(item)}
-                      >
-                        Elimina
-                      </Button>
-                    </div>
-                  </td>
+                  {!readOnly && (
+                    <td className="py-2">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="secondary"
+                          className="px-3 py-1 text-xs"
+                          onClick={() => {
+                            setFormError(null);
+                            setFormState({ mode: 'edit', item });
+                          }}
+                        >
+                          Modifica
+                        </Button>
+                        <Button
+                          variant="danger"
+                          className="px-3 py-1 text-xs"
+                          disabled={!canDelete(item)}
+                          title={!canDelete(item) ? deleteDisabledTitle?.(item) : undefined}
+                          onClick={() => setItemToDelete(item)}
+                        >
+                          Elimina
+                        </Button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -166,34 +174,38 @@ export default function ResourcePage({
     <>
       {embedded ? content : <Card>{content}</Card>}
 
-      <Modal
-        isOpen={formState !== null}
-        onClose={() => setFormState(null)}
-        title={formState?.mode === 'edit' ? 'Modifica' : newButtonLabel}
-        size={modalSize}
-      >
-        {formState && (
-          <FormComponent
-            mode={formState.mode}
-            defaultValues={formState.mode === 'edit' ? formState.item : undefined}
-            onSubmit={handleSubmit}
-            onCancel={() => setFormState(null)}
-            isSubmitting={isSubmitting}
-            serverError={formError}
-            {...formProps}
-          />
-        )}
-      </Modal>
+      {!readOnly && (
+        <>
+          <Modal
+            isOpen={formState !== null}
+            onClose={() => setFormState(null)}
+            title={formState?.mode === 'edit' ? 'Modifica' : newButtonLabel}
+            size={modalSize}
+          >
+            {formState && (
+              <FormComponent
+                mode={formState.mode}
+                defaultValues={formState.mode === 'edit' ? formState.item : undefined}
+                onSubmit={handleSubmit}
+                onCancel={() => setFormState(null)}
+                isSubmitting={isSubmitting}
+                serverError={formError}
+                {...formProps}
+              />
+            )}
+          </Modal>
 
-      <ConfirmDialog
-        isOpen={itemToDelete !== null}
-        title="Conferma eliminazione"
-        message={`Vuoi eliminare definitivamente "${itemToDelete ? getItemLabel(itemToDelete) : ''}"? L'operazione non è reversibile.`}
-        confirmLabel="Elimina"
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setItemToDelete(null)}
-        isLoading={isDeleting}
-      />
+          <ConfirmDialog
+            isOpen={itemToDelete !== null}
+            title="Conferma eliminazione"
+            message={`Vuoi eliminare definitivamente "${itemToDelete ? getItemLabel(itemToDelete) : ''}"? L'operazione non è reversibile.`}
+            confirmLabel="Elimina"
+            onConfirm={handleDeleteConfirm}
+            onCancel={() => setItemToDelete(null)}
+            isLoading={isDeleting}
+          />
+        </>
+      )}
     </>
   );
 }

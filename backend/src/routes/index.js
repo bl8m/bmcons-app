@@ -8,6 +8,8 @@ import phoneRoutes from './phoneRoutes.js';
 import emailAddressRoutes from './emailAddressRoutes.js';
 import bankRoutes from './bankRoutes.js';
 import bankAccountRoutes from './bankAccountRoutes.js';
+import loanRoutes from './loanRoutes.js';
+import loanInstallmentRoutes from './loanInstallmentRoutes.js';
 
 const router = Router();
 
@@ -22,5 +24,7 @@ router.use('/phones', phoneRoutes);
 router.use('/email-addresses', emailAddressRoutes);
 router.use('/banks', bankRoutes);
 router.use('/bank-accounts', bankAccountRoutes);
+router.use('/loans', loanRoutes);
+router.use('/loan-installments', loanInstallmentRoutes);
 
 export default router;

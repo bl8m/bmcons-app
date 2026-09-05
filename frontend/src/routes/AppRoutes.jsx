@@ -12,6 +12,8 @@ import PhonesPage from '../pages/PhonesPage.jsx';
 import EmailAddressesPage from '../pages/EmailAddressesPage.jsx';
 import BanksPage from '../pages/BanksPage.jsx';
 import BankAccountsPage from '../pages/BankAccountsPage.jsx';
+import LoansPage from '../pages/LoansPage.jsx';
+import LoanInstallmentsPage from '../pages/LoanInstallmentsPage.jsx';
 import MyProfilePage from '../pages/MyProfilePage.jsx';
 import NotFound from '../pages/NotFound.jsx';
 
@@ -37,6 +39,10 @@ export default function AppRoutes() {
           <Route path="/admin/emails" element={<EmailAddressesPage />} />
           <Route path="/admin/banks" element={<BanksPage />} />
           <Route path="/admin/bank-accounts" element={<BankAccountsPage />} />
+
+          {/* MUTUI */}
+          <Route path="/admin/loans" element={<LoansPage />} />
+          <Route path="/admin/loan-installments" element={<LoanInstallmentsPage />} />
         </Route>
       </Route>
 
@@ -50,6 +56,10 @@ export default function AppRoutes() {
           <Route path="/customer/phones" element={<PhonesPage />} />
           <Route path="/customer/emails" element={<EmailAddressesPage />} />
           <Route path="/customer/bank-accounts" element={<BankAccountsPage />} />
+
+          {/* Mutui e rate: sola lettura per il customer (gestione riservata all'amministratore) */}
+          <Route path="/customer/loans" element={<LoansPage />} />
+          <Route path="/customer/loan-installments" element={<LoanInstallmentsPage />} />
         </Route>
       </Route>
 
