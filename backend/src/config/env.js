@@ -1,5 +1,15 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
+
+// Unico .env del progetto, nella root (vedi frontend/vite.config.js per il
+// suo equivalente lato Vite). In Docker le variabili arrivano già iniettate
+// via env_file in docker-compose.yml, quindi qui dotenv non trova il file
+// (non è montato nel container) e non fa nulla: process.env ha comunque la
+// precedenza su quanto dotenv caricherebbe da un .env.
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(currentDir, '../../../.env') });
 
 // Valida le variabili d'ambiente all'avvio: se manca qualcosa di essenziale
 // l'app si ferma subito con un messaggio chiaro, invece di fallire più tardi

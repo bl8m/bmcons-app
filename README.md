@@ -15,17 +15,15 @@ Web application composta da:
 
 ## Avvio in locale (Docker)
 
-1. Copia i file d'esempio delle variabili d'ambiente:
+1. Copia il file d'esempio delle variabili d'ambiente (un unico `.env` per l'intero progetto, nella root):
 
    ```bash
    cp .env.example .env
-   cp backend/.env.example backend/.env
-   cp frontend/.env.example frontend/.env
    ```
 
-2. Personalizza almeno:
-   - `backend/.env`: `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` (es. `openssl rand -hex 64`), `ADMIN_EMAIL`/`ADMIN_PASSWORD`, `ANTHROPIC_API_KEY`.
-   - Le credenziali Mongo devono combaciare tra `.env` (root) e `backend/.env` (`MONGO_URI`).
+2. Personalizza almeno: `JWT_ACCESS_SECRET`/`JWT_REFRESH_SECRET` (es. `openssl rand -hex 64`), `ADMIN_EMAIL`/`ADMIN_PASSWORD`, `ANTHROPIC_API_KEY`.
+
+   Le credenziali Mongo (`MONGO_ROOT_USERNAME`/`MONGO_ROOT_PASSWORD`) vanno cambiate una volta sola: `docker-compose.yml` ricompone da solo il `MONGO_URI` del backend a partire da queste, quindi non serve tenerlo sincronizzato a mano (la riga `MONGO_URI` nel `.env` è usata solo per lo sviluppo senza Docker, vedi sotto).
 
 3. Avvia tutti i container:
 
@@ -93,4 +91,4 @@ cd backend && npm install && npm run dev
 cd frontend && npm install && npm run dev
 ```
 
-Richiede un'istanza MongoDB raggiungibile (locale o via `docker compose up mongodb`).
+Richiede un'istanza MongoDB raggiungibile (locale o via `docker compose up mongodb`). Backend (`dotenv`, in `src/config/env.js`) e frontend (`envDir` in `vite.config.js`) leggono entrambi lo stesso `.env` nella root del progetto, senza bisogno di file separati per cartella.

@@ -43,7 +43,12 @@ services:
       mongodb:
         condition: service_healthy
     env_file:
-      - ./backend/.env
+      - ./.env
+    environment:
+      # Sovrascrive il MONGO_URI del .env (pensato per l'uso senza Docker)
+      # componendolo dalle stesse credenziali di mongodb qui sopra: evita di
+      # doverle tenere sincronizzate manualmente in due punti.
+      MONGO_URI: mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-Password123}@mongodb:27017/${MONGO_DB_NAME:-bmcons}?authSource=admin
     ports:
       - "${BACKEND_PORT:-4000}:4000"
     volumes:
@@ -60,7 +65,7 @@ services:
     depends_on:
       - backend
     env_file:
-      - ./frontend/.env
+      - ./.env
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
     volumes:
