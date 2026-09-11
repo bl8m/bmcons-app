@@ -19,5 +19,6 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
+    allowedHosts: ['bmcons.site-dev.it','bmcons-app.site.dev.it']
   },
 });
