@@ -23,8 +23,13 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    // Se a fallire con 401 è la stessa chiamata di refresh (es. nessun
+    // refresh token valido, come al primo avvio senza sessione), non va
+    // ritentata: altrimenti richiamerebbe se stessa e resterebbe in deadlock
+    // (la promise non si risolverebbe mai), bloccando initialize() in eterno.
+    const isRefreshCall = originalRequest?.url?.includes('/auth/refresh');
 
-    if (error.response?.status !== 401 || originalRequest._retry) {
+    if (error.response?.status !== 401 || originalRequest._retry || isRefreshCall) {
       return Promise.reject(error);
     }
     originalRequest._retry = true;
