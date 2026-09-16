@@ -11,6 +11,14 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 export const app = express();
 
+// Necessario dietro un reverse proxy con un solo hop (es. Traefik su
+// Dokploy): permette a Express (e a express-rate-limit) di ricavare il vero
+// IP del client da X-Forwarded-For invece di vedere sempre l'IP del proxy —
+// senza questo, express-rate-limit applicherebbe il limite a TUTTI gli
+// utenti insieme come se fossero un solo client. In locale, senza un proxy
+// davanti, l'header non è presente e non cambia nulla.
+app.set('trust proxy', 1);
+
 app.use(helmet());
 app.use(
   cors({
