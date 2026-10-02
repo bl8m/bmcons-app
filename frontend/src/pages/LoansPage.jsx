@@ -15,6 +15,9 @@ export default function LoansPage() {
   // per il customer il backend scopera comunque solo i propri mutui, quindi
   // qui il filtro ha effetto solo per l'amministratore.
   const customerIdFilter = searchParams.get('customerId') ?? undefined;
+  // Es. /admin/loans?edit=... (link "N." nello scadenzario mutui): apre
+  // direttamente la modale di modifica per quel mutuo, vedi ResourcePage.
+  const editId = searchParams.get('edit') ?? undefined;
   const [customers, setCustomers] = useState(null);
   const [banks, setBanks] = useState([]);
 
@@ -77,6 +80,7 @@ export default function LoansPage() {
         formProps={{ customers: isAdmin ? (customers ?? []) : undefined, banks }}
         modalSize="xl"
         readOnly={!isAdmin}
+        initialEditId={editId}
       />
     </div>
   );

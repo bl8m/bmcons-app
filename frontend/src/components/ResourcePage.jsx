@@ -31,6 +31,11 @@ import ConfirmDialog from './ConfirmDialog.jsx';
 //   pre-filtrare l'elenco in base a un parametro nell'URL)
 // - headerActions: pulsanti/elementi aggiuntivi mostrati in alto a fianco di
 //   "Nuovo" (es. "Importa visura")
+// - initialEditId: se valorizzato, non appena l'elenco viene caricato e
+//   contiene un elemento con questo _id, apre automaticamente la modale di
+//   modifica per quell'elemento (una sola volta). Usato per i link profondi
+//   verso la modifica di un record specifico (es. "N." nello scadenzario
+//   mutui -> /admin/loans?edit=<id>).
 export default function ResourcePage({
   title,
   api,
@@ -48,6 +53,7 @@ export default function ResourcePage({
   extraRowActions,
   listParams,
   headerActions,
+  initialEditId,
 }) {
   const [items, setItems] = useState(null);
   const [loadError, setLoadError] = useState(null);
@@ -60,6 +66,8 @@ export default function ResourcePage({
   const [itemToDelete, setItemToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const [hasOpenedInitialEdit, setHasOpenedInitialEdit] = useState(false);
+
   const fetchItems = useCallback(async () => {
     try {
       setItems(await api.list(listParams));
@@ -71,6 +79,15 @@ export default function ResourcePage({
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
+
+  useEffect(() => {
+    if (!initialEditId || hasOpenedInitialEdit || !items) return;
+    const match = items.find((item) => item._id === initialEditId);
+    if (match) {
+      setFormState({ mode: 'edit', item: match });
+    }
+    setHasOpenedInitialEdit(true);
+  }, [initialEditId, items, hasOpenedInitialEdit]);
 
   const handleSubmit = async (payload) => {
     setIsSubmitting(true);

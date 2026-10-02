@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import Card from '../components/Card.jsx';
 import Spinner from '../components/Spinner.jsx';
 import StatTile from '../components/StatTile.jsx';
+import LoanScheduleReport from '../components/LoanScheduleReport.jsx';
 import { customersApi } from '../features/customers/customersApi.js';
 import { loansApi } from '../features/loans/loansApi.js';
 
@@ -51,6 +52,8 @@ export default function CustomerDetailPage() {
       <div className="grid max-w-xs grid-cols-1 gap-4">
         <StatTile value={loanCount ?? '—'} label="Mutui" linkUrl={`/admin/loans?customerId=${id}`} />
       </div>
+
+      <LoanScheduleReport customerId={id} />
     </div>
   );
 }

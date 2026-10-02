@@ -11,13 +11,17 @@ import { emailAddressesApi } from '../emailAddresses/emailAddressesApi.js';
 import BankAccountForm from '../bankAccounts/BankAccountForm.jsx';
 import { bankAccountsApi } from '../bankAccounts/bankAccountsApi.js';
 import { banksApi } from '../banks/banksApi.js';
+import AttachmentsTab from '../../components/AttachmentsTab.jsx';
+import CustomerDetailsForm from './CustomerDetailsForm.jsx';
 
 const TABS = [
   { key: 'profile', label: 'Dati anagrafici' },
+  { key: 'details', label: 'Dettagli' },
   { key: 'addresses', label: 'Indirizzi' },
   { key: 'phones', label: 'Telefoni' },
   { key: 'emails', label: 'Email' },
   { key: 'bankAccounts', label: 'Conti correnti' },
+  { key: 'attachments', label: 'Allegati' },
 ];
 
 const boolLabel = (item) => (item.isPrimary ? 'Sì' : 'No');
@@ -51,6 +55,10 @@ export default function CustomerFormWithTabs(props) {
 
       {activeTab === 'profile' && (
         <CustomerForm mode={mode} defaultValues={defaultValues} users={users} {...formOnlyProps} />
+      )}
+
+      {activeTab === 'details' && (
+        <CustomerDetailsForm customerId={customerId} defaultValues={defaultValues} />
       )}
 
       {activeTab === 'addresses' && (
@@ -121,6 +129,10 @@ export default function CustomerFormWithTabs(props) {
             },
           ]}
         />
+      )}
+
+      {activeTab === 'attachments' && (
+        <AttachmentsTab attachableType="Customer" attachableId={customerId} />
       )}
     </div>
   );

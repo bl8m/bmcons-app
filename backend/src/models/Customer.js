@@ -1,4 +1,23 @@
 import mongoose from 'mongoose';
+import { round2 } from '../utils/round2.js';
+
+const personSchemaFields = {
+  lastName: { type: String, trim: true },
+  firstName: { type: String, trim: true },
+  taxCode: { type: String, trim: true },
+};
+
+// Repeater "Soci": un record per socio, con la propria quota di partecipazione.
+const shareholderSchema = new mongoose.Schema(
+  { ...personSchemaFields, share: { type: String, trim: true } },
+  { _id: true }
+);
+
+// Repeater "Amministratori": un record per amministratore, con la carica ricoperta.
+const administratorSchema = new mongoose.Schema(
+  { ...personSchemaFields, role: { type: String, trim: true } },
+  { _id: true }
+);
 
 const customerSchema = new mongoose.Schema(
   {
@@ -34,6 +53,32 @@ const customerSchema = new mongoose.Schema(
     legalRepresentativeTaxCode: {
       type: String,
       trim: true,
+    },
+
+    // --- Dettagli (dati tipicamente presenti in una visura camerale) ---
+    subscribedShareCapital: {
+      type: Number,
+      min: 0,
+      set: round2,
+    },
+    businessStartDate: {
+      type: Date,
+    },
+    administrationSystem: {
+      type: String,
+      trim: true,
+    },
+    businessActivity: {
+      type: String,
+      trim: true,
+    },
+    shareholders: {
+      type: [shareholderSchema],
+      default: [],
+    },
+    administrators: {
+      type: [administratorSchema],
+      default: [],
     },
   },
   { timestamps: true }

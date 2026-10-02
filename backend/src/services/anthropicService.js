@@ -8,6 +8,11 @@ import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { env } from '../config/env.js';
 import { ApiError } from '../utils/ApiError.js';
 import { loanInstallmentImportSchema } from '../validators/loanInstallmentImportSchema.js';
+import {
+  visuraCompanySchema,
+  visuraPeopleSchema,
+  visuraContactsSchema,
+} from '../validators/visuraImportSchema.js';
 
 const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
@@ -118,4 +123,50 @@ export function extractLoanInstallmentsFromPdf(pdfBuffer) {
     // generare centinaia di righe: margine più ampio del default.
     32000
   );
+}
+
+const VISURA_COMMON_INSTRUCTIONS =
+  "Questo documento è una visura camerale (estratto del registro delle imprese) di una " +
+  "società italiana. Se un'informazione non è presente nel documento, ometti il relativo " +
+  'campo invece di inventarlo.';
+
+/**
+ * Estrae i dati anagrafici di una visura camerale (dati societari, soci,
+ * amministratori, sede legale/sedi secondarie, telefoni, email).
+ *
+ * Diviso in 3 chiamate separate ed eseguite in parallelo sullo stesso PDF
+ * (invece di un unico schema con tutto): l'API Anthropic rifiuta con
+ * "Schema is too complex" uno schema con troppe strutture annidate/ripetute
+ * tutte insieme (vedi validators/visuraImportSchema.js).
+ *
+ * I tipi restano quelli "grezzi" degli schemi di estrazione (date come
+ * stringa) — la normalizzazione verso i tipi reali del DB avviene a valle,
+ * nel controller che gestisce l'importazione.
+ */
+export async function extractVisuraDataFromPdf(pdfBuffer) {
+  const [company, people, contacts] = await Promise.all([
+    extractStructuredDataFromPdf(
+      pdfBuffer,
+      visuraCompanySchema,
+      `${VISURA_COMMON_INSTRUCTIONS} Estrai: ragione sociale, partita IVA, codice fiscale della ` +
+        'società, dati del legale rappresentante, capitale sociale sottoscritto (in euro), data ' +
+        'di inizio attività (formato YYYY-MM-DD), sistema di amministrazione, descrizione ' +
+        "dell'attività svolta."
+    ),
+    extractStructuredDataFromPdf(
+      pdfBuffer,
+      visuraPeopleSchema,
+      `${VISURA_COMMON_INSTRUCTIONS} Estrai l'elenco soci (cognome, nome, codice fiscale, quota ` +
+        'di partecipazione) e l\'elenco amministratori (cognome, nome, codice fiscale, carica).'
+    ),
+    extractStructuredDataFromPdf(
+      pdfBuffer,
+      visuraContactsSchema,
+      `${VISURA_COMMON_INSTRUCTIONS} Estrai la sede legale, eventuali sedi secondarie/operative, ` +
+        'numeri di telefono e indirizzi email (specifica "PEC" come etichetta se l\'indirizzo è ' +
+        'di posta elettronica certificata).'
+    ),
+  ]);
+
+  return { ...company, ...people, ...contacts };
 }

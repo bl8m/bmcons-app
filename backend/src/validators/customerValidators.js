@@ -1,5 +1,19 @@
 import { z } from 'zod';
-import { optionalString, optionalObjectId } from './common.js';
+import { optionalString, optionalObjectId, optionalNumber, optionalDate } from './common.js';
+
+const shareholderSchema = z.object({
+  lastName: optionalString(),
+  firstName: optionalString(),
+  taxCode: optionalString(),
+  share: optionalString(),
+});
+
+const administratorSchema = z.object({
+  lastName: optionalString(),
+  firstName: optionalString(),
+  taxCode: optionalString(),
+  role: optionalString(),
+});
 
 export const createCustomerSchema = z.object({
   userId: optionalObjectId(),
@@ -9,6 +23,14 @@ export const createCustomerSchema = z.object({
   legalRepresentativeFirstName: optionalString(),
   legalRepresentativeLastName: optionalString(),
   legalRepresentativeTaxCode: optionalString(),
+
+  // Dettagli (dati tipicamente presenti in una visura camerale)
+  subscribedShareCapital: optionalNumber(),
+  businessStartDate: optionalDate(),
+  administrationSystem: optionalString(),
+  businessActivity: optionalString(),
+  shareholders: z.array(shareholderSchema).optional(),
+  administrators: z.array(administratorSchema).optional(),
 });
 
 export const updateCustomerSchema = createCustomerSchema.partial();

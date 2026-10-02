@@ -2,9 +2,11 @@ import { env } from './config/env.js';
 import { connectDB } from './config/db.js';
 import { app } from './app.js';
 import { ensureAdminUser } from './seed/ensureAdminUser.js';
+import { ensureAttachmentsDir } from './services/attachmentService.js';
 
 async function start() {
   await connectDB();
+  await ensureAttachmentsDir();
 
   // Idempotente: crea l'amministratore iniziale solo se non esiste già,
   // utile soprattutto al primo avvio su un ambiente con database vuoto

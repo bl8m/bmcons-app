@@ -57,6 +57,19 @@ export const requiredNumber = (message = 'Campo obbligatorio') =>
 export const requiredMoney = (message = 'Campo obbligatorio') =>
   requiredNumber(message).transform(round2);
 
+// Campo data facoltativo: stringa vuota/non valida diventa "assente" invece
+// di far fallire la validazione.
+export const optionalDate = () =>
+  z
+    .union([z.string(), z.date()])
+    .optional()
+    .nullable()
+    .transform((value) => {
+      if (!value) return undefined;
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? undefined : date;
+    });
+
 // Campo intero obbligatorio (es. numero rata, durata in anni).
 export const requiredInteger = (message = 'Campo obbligatorio') =>
   z

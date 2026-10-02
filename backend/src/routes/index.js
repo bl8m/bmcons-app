@@ -11,6 +11,7 @@ import bankAccountRoutes from './bankAccountRoutes.js';
 import loanRoutes from './loanRoutes.js';
 import loanInstallmentRoutes from './loanInstallmentRoutes.js';
 import backupRoutes from './backupRoutes.js';
+import attachmentRoutes from './attachmentRoutes.js';
 
 const router = Router();
 
@@ -28,5 +29,6 @@ router.use('/bank-accounts', bankAccountRoutes);
 router.use('/loans', loanRoutes);
 router.use('/loan-installments', loanInstallmentRoutes);
 router.use('/admin/backups', backupRoutes);
+router.use('/attachments', attachmentRoutes);
 
 export default router;
