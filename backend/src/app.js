@@ -24,6 +24,9 @@ app.use(
   cors({
     origin: env.CORS_ORIGIN,
     credentials: true,
+    // Esposto per completezza (es. un client non-browser che legge il nome
+    // file suggerito); il frontend genera comunque il proprio nome file.
+    exposedHeaders: ['Content-Disposition'],
   })
 );
 app.use(express.json());

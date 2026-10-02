@@ -1,0 +1,86 @@
+
+devo realizzare una web application per un cliente, composta da 2 componenti, un backend che espone delle api e un frontend che si collega alle api. Vorrei usare per entrambi javascript: per il backend proporrei express + mongoose, collegato a mongodb. Per il frontend React + tailwind + zustand + React router. Per lo sviluppo servirà predisporre una serie di container docker. L'app prevede un accesso con email e password. Gli utenti possono essere di 2 tipi per ora: administrator (che può gestire gli utenti e i dati associati a tutti loro) e customer (che sono i clienti, che possono accedere all'applicazione e gestire i propri dati). Se conosci librerie standard per gestire l'autenticazione e i ruoli proponimela. Le entità da gestire le vedremo in un secondo momento, ma ti anticipo che servirà integrarsi con le API di Anthropic per l'elaborazione di file pdf e la conseguente importazione dei dati contenuti in tabelle. Il frontend dev'essere costituito da elementi modulari e riutilizzabili, per consentire una facile manutenzione. Come colore principale vorrei usare il rosso #e11117 e per il testo il grigio #707374.
+
+puoi aggiungere per favore nella pagina degli utenti la possibilita di crearne di nuovi, di modificare o cancellare gli esistenti? nel form di modifica deve essere possibile modificare la password, inserendola 2 volte per conferma, e decidere il ruolo dell'utente (administrator o customer)
+
+Passiamo ora alla creazione delle altre entita. Ti elenco le informazioni che mi servono, e come sono messe in relazione tra loro. Se hai dubbi fammi domande. Ho indicato sempre come id il codice univoco che dovrebbe essere assegnato automaticamente. Con l'asterisco sono indicati i campi obbligatori. Per ciascuna entità vorrei come per gli utenti la possibilità di visualizzare l'elenco e di creare/modificare/cancellare i record. Vorrei che tutte queste sezioni siano raggiungibili da voci di menu inserite. in un dropdown con titolo ANAGRAFICHE
+
+ENTITA: CLIENTI
+id 
+id UTENTE: eventuale associazione con la tabella degli account di accesso)
+ragione sociale*
+partita iva
+codice fiscale
+nome legale rappresentante
+cognome legale rappresentante
+codice fiscale legale rappresentante
+
+
+ENTITA: INDIRIZZI
+id 
+id ANAGRAFICA*
+etichetta*
+indirizzo*
+citta*
+cap
+provincia
+stato
+principale (BOOLEANO)
+
+ENTITA: TELEFONI
+id 
+id ANAGRAFICA*
+etichetta*
+numero*
+principale (BOOLEANO)
+
+ENTITA: INDIRIZZI EMAIL
+id 
+id ANAGRAFICA*
+etichetta*
+email*
+principale (BOOLEANO)
+
+ENTITA: BANCHE
+id
+nome*
+
+ENTITA: CONTI CORRENTI
+id
+id BANCA*
+id ANAGRAFICA*
+etichetta*
+IBAN*
+agenzia
+note
+
+
+ok, ora passiamo alle funzionalità più specifiche dell'app: per ciascuna anagrafica devono poter essere inseriti piu record di tipo MUTUO. Per ciascuna istanza di MUTUO potranno essere inserite le RATE MUTUO correlate. A livello di interfaccia prevediamo la stessa logica delle altre entità, con lista, creazione, modifica e cancellazione. Mutui e rate andranno inseriti in un nuovo dropdown con etichetta "Mutui". Nella modale di dettaglio prevediamo 3 tab: uno con le informazioni modificabili, una con l'elenco delle rate e una con un modulo per il caricamento di un file. Del caricamento del file ce ne occuperemo dopo, ma ti anticipo che l'obiettivo è quello di caricare dei pdf con l'elenco delle rate per farle importare in maniera automatica dall'applicativo
+
+ENTITA: MUTUO
+id
+id ANAGRAFICA* 
+id BANCA*
+etichetta*
+importo* (numero a 2 decimali)
+durata (indicata in anni)
+tipo (per ora stringa, poi inseriremo dei valori tra cui scegliere)
+
+ENTITA: RATE MUTUO
+id
+id MUTUO*
+numero* 
+scadenza* (data)
+importo* (numero a 2 decimali)
+quota capitale* (numero a 2 decimali)
+quota interessi* (numero a 2 decimali)
+debito residuo* (numero a 2 decimali)
+oneri (numero a 2 decimali, default 0)
+pagata (booleano)
+
+
+
+
+
+
+

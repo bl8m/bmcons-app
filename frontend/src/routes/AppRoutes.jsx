@@ -14,6 +14,7 @@ import BanksPage from '../pages/BanksPage.jsx';
 import BankAccountsPage from '../pages/BankAccountsPage.jsx';
 import LoansPage from '../pages/LoansPage.jsx';
 import LoanInstallmentsPage from '../pages/LoanInstallmentsPage.jsx';
+import ImportExportPage from '../pages/ImportExportPage.jsx';
 import MyProfilePage from '../pages/MyProfilePage.jsx';
 import NotFound from '../pages/NotFound.jsx';
 
@@ -43,6 +44,9 @@ export default function AppRoutes() {
           {/* MUTUI */}
           <Route path="/admin/loans" element={<LoansPage />} />
           <Route path="/admin/loan-installments" element={<LoanInstallmentsPage />} />
+
+          {/* AMMINISTRAZIONE */}
+          <Route path="/admin/import-export" element={<ImportExportPage />} />
         </Route>
       </Route>
 

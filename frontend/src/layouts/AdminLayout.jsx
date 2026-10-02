@@ -23,6 +23,8 @@ const MUTUI_ITEMS = [
   { to: '/admin/loan-installments', label: 'Rate mutuo' },
 ];
 
+const AMMINISTRAZIONE_ITEMS = [{ to: '/admin/import-export', label: 'Import/Export' }];
+
 export default function AdminLayout() {
   const { user, logout } = useAuthStore();
 
@@ -40,6 +42,7 @@ export default function AdminLayout() {
             </NavLink>
             <NavDropdown label="Anagrafiche" items={ANAGRAFICHE_ITEMS} />
             <NavDropdown label="Mutui" items={MUTUI_ITEMS} />
+            <NavDropdown label="Amministrazione" items={AMMINISTRAZIONE_ITEMS} />
           </nav>
         </div>
         <div className="flex items-center gap-4">
