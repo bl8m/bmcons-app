@@ -35,16 +35,20 @@ app.use(mongoSanitize());
 app.use(morgan(env.NODE_ENV === 'development' ? 'dev' : 'combined'));
 
 // Rate limit più stringente sulle rotte di autenticazione, per mitigare
-// tentativi di brute-force sul login.
-app.use(
-  '/api/auth',
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 20,
-    standardHeaders: true,
-    legacyHeaders: false,
-  })
-);
+// tentativi di brute-force sul login. Disattivato in sviluppo, dove i test
+// ripetuti (anche manuali) esauriscono rapidamente il limite senza che ci
+// sia un reale rischio di brute-force da mitigare.
+if (env.NODE_ENV !== 'development') {
+  app.use(
+    '/api/auth',
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      limit: 20,
+      standardHeaders: true,
+      legacyHeaders: false,
+    })
+  );
+}
 
 app.use('/api', routes);
 

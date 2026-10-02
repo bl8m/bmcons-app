@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import ResourcePage from '../components/ResourcePage.jsx';
 import LoanFormWithTabs from '../features/loans/LoanFormWithTabs.jsx';
 import { loansApi } from '../features/loans/loansApi.js';
@@ -9,6 +10,11 @@ import { formatCurrency } from '../lib/format.js';
 
 export default function LoansPage() {
   const isAdmin = useAuthStore((state) => state.user?.role === 'administrator');
+  const [searchParams] = useSearchParams();
+  // Es. /admin/loans?customerId=... (link da StatTile nella scheda cliente):
+  // per il customer il backend scopera comunque solo i propri mutui, quindi
+  // qui il filtro ha effetto solo per l'amministratore.
+  const customerIdFilter = searchParams.get('customerId') ?? undefined;
   const [customers, setCustomers] = useState(null);
   const [banks, setBanks] = useState([]);
 
@@ -22,6 +28,11 @@ export default function LoansPage() {
     }
   }, [isAdmin]);
 
+  const listParams = useMemo(
+    () => (customerIdFilter ? { customerId: customerIdFilter } : undefined),
+    [customerIdFilter]
+  );
+
   const columns = [
     { key: 'label', label: 'Etichetta' },
     { key: 'amount', label: 'Importo', render: (item) => formatCurrency(item.amount) },
@@ -30,7 +41,8 @@ export default function LoansPage() {
     { key: 'bank', label: 'Banca', render: (item) => banks.find((b) => b._id === item.bankId)?.name ?? '—' },
   ];
 
-  if (isAdmin) {
+  // Colonna "Cliente" ridondante quando l'elenco è già filtrato su un solo cliente.
+  if (isAdmin && !customerIdFilter) {
     columns.push({
       key: 'customer',
       label: 'Cliente',
@@ -38,17 +50,34 @@ export default function LoansPage() {
     });
   }
 
+  const filteredCustomerName =
+    isAdmin && customerIdFilter
+      ? (customers?.find((c) => c._id === customerIdFilter)?.companyName ?? customerIdFilter)
+      : null;
+
   return (
-    <ResourcePage
-      title="Mutui"
-      newButtonLabel="Nuovo mutuo"
-      api={loansApi}
-      columns={columns}
-      getItemLabel={(item) => item.label}
-      FormComponent={LoanFormWithTabs}
-      formProps={{ customers: isAdmin ? (customers ?? []) : undefined, banks }}
-      modalSize="xl"
-      readOnly={!isAdmin}
-    />
+    <div className="flex flex-col gap-4">
+      {filteredCustomerName && (
+        <p className="text-sm text-text">
+          Filtrato per cliente: <strong>{filteredCustomerName}</strong> —{' '}
+          <Link to="/admin/loans" className="font-medium text-primary hover:text-primary-600">
+            mostra tutti
+          </Link>
+        </p>
+      )}
+
+      <ResourcePage
+        title="Mutui"
+        newButtonLabel="Nuovo mutuo"
+        api={loansApi}
+        listParams={listParams}
+        columns={columns}
+        getItemLabel={(item) => item.label}
+        FormComponent={LoanFormWithTabs}
+        formProps={{ customers: isAdmin ? (customers ?? []) : undefined, banks }}
+        modalSize="xl"
+        readOnly={!isAdmin}
+      />
+    </div>
   );
 }

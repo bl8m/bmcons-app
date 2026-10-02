@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from './authStore.js';
 import Input from '../../components/Input.jsx';
+import PasswordInput from '../../components/PasswordInput.jsx';
 import Button from '../../components/Button.jsx';
 import Card from '../../components/Card.jsx';
 import logo from '../../assets/images/bmcons-logo.png';
@@ -24,8 +25,14 @@ export default function LoginPage() {
     try {
       await login(email, password);
       navigate(location.state?.from ?? '/', { replace: true });
-    } catch {
-      setServerError('Email o password non corretti.');
+    } catch (error) {
+      if (error.response?.status === 429) {
+        setServerError('Troppi tentativi di accesso, riprova tra qualche minuto.');
+      } else if (error.response?.status === 401) {
+        setServerError('Email o password non corretti.');
+      } else {
+        setServerError('Accesso non riuscito, riprova.');
+      }
     }
   };
 
@@ -45,9 +52,8 @@ export default function LoginPage() {
             error={errors.email?.message}
             {...register('email', { required: 'Email obbligatoria' })}
           />
-          <Input
+          <PasswordInput
             id="password"
-            type="password"
             label="Password"
             autoComplete="current-password"
             error={errors.password?.message}

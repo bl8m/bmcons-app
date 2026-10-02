@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import ResourcePage from '../components/ResourcePage.jsx';
 import CustomerFormWithTabs from '../features/customers/CustomerFormWithTabs.jsx';
 import { customersApi } from '../features/customers/customersApi.js';
@@ -26,6 +27,14 @@ export default function CustomersPage() {
           render: (item) => customerUsers.find((u) => u._id === item.userId)?.email ?? '—',
         },
       ]}
+      extraRowActions={(item) => (
+        <Link
+          to={`/admin/customers/${item._id}`}
+          className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-text transition-colors hover:bg-gray-50"
+        >
+          Visualizza
+        </Link>
+      )}
       getItemLabel={(item) => item.companyName}
       FormComponent={CustomerFormWithTabs}
       formProps={{ users: customerUsers }}

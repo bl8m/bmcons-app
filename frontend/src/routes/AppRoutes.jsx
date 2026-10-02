@@ -7,6 +7,7 @@ import CustomerLayout from '../layouts/CustomerLayout.jsx';
 import AdminDashboard from '../pages/AdminDashboard.jsx';
 import UsersPage from '../pages/UsersPage.jsx';
 import CustomersPage from '../pages/CustomersPage.jsx';
+import CustomerDetailPage from '../pages/CustomerDetailPage.jsx';
 import AddressesPage from '../pages/AddressesPage.jsx';
 import PhonesPage from '../pages/PhonesPage.jsx';
 import EmailAddressesPage from '../pages/EmailAddressesPage.jsx';
@@ -35,6 +36,7 @@ export default function AppRoutes() {
 
           {/* ANAGRAFICHE */}
           <Route path="/admin/customers" element={<CustomersPage />} />
+          <Route path="/admin/customers/:id" element={<CustomerDetailPage />} />
           <Route path="/admin/addresses" element={<AddressesPage />} />
           <Route path="/admin/phones" element={<PhonesPage />} />
           <Route path="/admin/emails" element={<EmailAddressesPage />} />

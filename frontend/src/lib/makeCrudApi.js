@@ -6,6 +6,7 @@ import { api } from './axios.js';
 export const makeCrudApi = (basePath) => ({
   // params: query string opzionale (es. { customerId } per filtrare lato admin)
   list: (params) => api.get(basePath, { params }).then((res) => res.data.items),
+  get: (id) => api.get(`${basePath}/${id}`).then((res) => res.data.item),
   create: (data) => api.post(basePath, data).then((res) => res.data.item),
   update: (id, data) => api.patch(`${basePath}/${id}`, data).then((res) => res.data.item),
   remove: (id) => api.delete(`${basePath}/${id}`),

@@ -24,6 +24,13 @@ import ConfirmDialog from './ConfirmDialog.jsx';
 // - readOnly: se true, nasconde "Nuovo"/"Modifica"/"Elimina" e mostra solo
 //   l'elenco (usato per l'accesso in sola lettura del customer a dati che
 //   gestisce solo l'amministratore, es. Mutui e Rate)
+// - extraRowActions(item): azioni aggiuntive per riga, renderizzate nella
+//   stessa colonna "Azioni" prima di Modifica/Elimina (es. un link
+//   "Visualizza" verso una pagina di dettaglio)
+// - listParams: query opzionale passata ad api.list(listParams) (es. per
+//   pre-filtrare l'elenco in base a un parametro nell'URL)
+// - headerActions: pulsanti/elementi aggiuntivi mostrati in alto a fianco di
+//   "Nuovo" (es. "Importa visura")
 export default function ResourcePage({
   title,
   api,
@@ -38,6 +45,9 @@ export default function ResourcePage({
   embedded = false,
   modalSize = 'md',
   readOnly = false,
+  extraRowActions,
+  listParams,
+  headerActions,
 }) {
   const [items, setItems] = useState(null);
   const [loadError, setLoadError] = useState(null);
@@ -52,11 +62,11 @@ export default function ResourcePage({
 
   const fetchItems = useCallback(async () => {
     try {
-      setItems(await api.list());
+      setItems(await api.list(listParams));
     } catch {
       setLoadError('Impossibile caricare i dati.');
     }
-  }, [api]);
+  }, [api, listParams]);
 
   useEffect(() => {
     fetchItems();
@@ -98,16 +108,20 @@ export default function ResourcePage({
     <>
       <div className="mb-4 flex items-center justify-between">
         {title && <h1 className="text-lg font-semibold text-text-dark">{title}</h1>}
-        {!readOnly && (
-          <Button
-            className={title ? '' : 'ml-auto'}
-            onClick={() => {
-              setFormError(null);
-              setFormState({ mode: 'create' });
-            }}
-          >
-            {newButtonLabel}
-          </Button>
+        {(headerActions || !readOnly) && (
+          <div className={`flex items-center gap-2 ${title ? '' : 'ml-auto'}`}>
+            {headerActions}
+            {!readOnly && (
+              <Button
+                onClick={() => {
+                  setFormError(null);
+                  setFormState({ mode: 'create' });
+                }}
+              >
+                {newButtonLabel}
+              </Button>
+            )}
+          </div>
         )}
       </div>
 
@@ -125,7 +139,7 @@ export default function ResourcePage({
                     {col.label}
                   </th>
                 ))}
-                {!readOnly && <th className="py-2 text-right">Azioni</th>}
+                {(!readOnly || extraRowActions) && <th className="py-2 text-right">Azioni</th>}
               </tr>
             </thead>
             <tbody>
@@ -136,28 +150,33 @@ export default function ResourcePage({
                       {col.render ? col.render(item) : (item[col.key] ?? '—')}
                     </td>
                   ))}
-                  {!readOnly && (
+                  {(!readOnly || extraRowActions) && (
                     <td className="py-2">
                       <div className="flex justify-end gap-2">
-                        <Button
-                          variant="secondary"
-                          className="px-3 py-1 text-xs"
-                          onClick={() => {
-                            setFormError(null);
-                            setFormState({ mode: 'edit', item });
-                          }}
-                        >
-                          Modifica
-                        </Button>
-                        <Button
-                          variant="danger"
-                          className="px-3 py-1 text-xs"
-                          disabled={!canDelete(item)}
-                          title={!canDelete(item) ? deleteDisabledTitle?.(item) : undefined}
-                          onClick={() => setItemToDelete(item)}
-                        >
-                          Elimina
-                        </Button>
+                        {extraRowActions?.(item)}
+                        {!readOnly && (
+                          <>
+                            <Button
+                              variant="secondary"
+                              className="px-3 py-1 text-xs"
+                              onClick={() => {
+                                setFormError(null);
+                                setFormState({ mode: 'edit', item });
+                              }}
+                            >
+                              Modifica
+                            </Button>
+                            <Button
+                              variant="danger"
+                              className="px-3 py-1 text-xs"
+                              disabled={!canDelete(item)}
+                              title={!canDelete(item) ? deleteDisabledTitle?.(item) : undefined}
+                              onClick={() => setItemToDelete(item)}
+                            >
+                              Elimina
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </td>
                   )}
