@@ -54,7 +54,11 @@ services:
     volumes:
       - ./backend:/app
       - backend-node-modules:/app/node_modules
-    command: npm run dev
+    # npm install prima di avviare: il volume node_modules è persistente tra
+    # i rebuild dell'immagine, quindi senza questo passaggio un nuovo
+    # pacchetto aggiunto a package.json resterebbe "invisibile" al container
+    # finché il volume non viene ricreato manualmente.
+    command: sh -c "npm install && npm run dev"
 
   frontend:
     build:
@@ -71,7 +75,9 @@ services:
     volumes:
       - ./frontend:/app
       - frontend-node-modules:/app/node_modules
-    command: npm run dev -- --host
+    # Stesso motivo del backend: riallinea node_modules a package.json a ogni
+    # avvio, anche se il volume persistente è rimasto indietro.
+    command: sh -c "npm install && npm run dev -- --host"
 
 volumes:
   mongo-data:
