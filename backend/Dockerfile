@@ -23,6 +23,11 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# .dockerignore esclude uploads/ dall'immagine: la cartella va creata qui e
+# assegnata a "node" PRIMA di passare a quell'utente, altrimenti il volume
+# montato in produzione su /app/uploads verrebbe creato di proprietà di root
+# al primo avvio, e il processo (non root) non potrebbe scriverci dentro.
+RUN mkdir -p /app/uploads/attachments && chown -R node:node /app/uploads
 EXPOSE 4000
 USER node
 CMD ["node", "src/server.js"]
