@@ -54,11 +54,15 @@ services:
     volumes:
       - ./backend:/app
       - backend-node-modules:/app/node_modules
-    # npm install prima di avviare: il volume node_modules è persistente tra
-    # i rebuild dell'immagine, quindi senza questo passaggio un nuovo
-    # pacchetto aggiunto a package.json resterebbe "invisibile" al container
-    # finché il volume non viene ricreato manualmente.
-    command: sh -c "npm install && npm run dev"
+    # npm ci prima di avviare: il volume node_modules è persistente tra i
+    # rebuild dell'immagine, quindi senza questo passaggio un nuovo pacchetto
+    # aggiunto a package.json resterebbe "invisibile" al container finché il
+    # volume non viene ricreato manualmente. npm ci (a differenza di npm
+    # install) reinstalla sempre da zero in base al lockfile: evita anche un
+    # bug noto di npm sulle optional dependency di piattaforma (es. il
+    # binario nativo di rollup per musl/Alpine) e fallisce se il lockfile non
+    # è allineato a package.json invece di procedere in modo incoerente.
+    command: sh -c "npm ci && npm run dev"
 
   frontend:
     build:
@@ -76,8 +80,9 @@ services:
       - ./frontend:/app
       - frontend-node-modules:/app/node_modules
     # Stesso motivo del backend: riallinea node_modules a package.json a ogni
-    # avvio, anche se il volume persistente è rimasto indietro.
-    command: sh -c "npm install && npm run dev -- --host"
+    # avvio (npm ci, non npm install: evita il bug noto di npm sulle optional
+    # dependency di piattaforma, es. i binari nativi di rollup per Alpine).
+    command: sh -c "npm ci && npm run dev -- --host"
 
 volumes:
   mongo-data:
