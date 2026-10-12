@@ -8,7 +8,7 @@ COPY package*.json ./
 # --- Stage: dev (hot reload con nodemon, sorgenti montati come volume) ---
 FROM base AS dev
 ENV NODE_ENV=development
-RUN npm install
+RUN npm ci
 COPY . .
 EXPOSE 4000
 CMD ["npm", "run", "dev"]

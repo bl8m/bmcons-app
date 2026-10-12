@@ -5,7 +5,7 @@ COPY package*.json ./
 
 # --- Stage: dev (Vite dev server con hot reload, sorgenti montati come volume) ---
 FROM base AS dev
-RUN npm install
+RUN npm ci
 COPY . .
 EXPOSE 5173
 CMD ["npm", "run", "dev", "--", "--host"]
@@ -17,7 +17,7 @@ FROM base AS build
 # arrivare come build arg (vedi docker-compose.prod.yml: build.args).
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
-RUN npm install
+RUN npm ci
 COPY . .
 RUN npm run build
 
