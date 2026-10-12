@@ -10,6 +10,9 @@ import bankRoutes from './bankRoutes.js';
 import bankAccountRoutes from './bankAccountRoutes.js';
 import loanRoutes from './loanRoutes.js';
 import loanInstallmentRoutes from './loanInstallmentRoutes.js';
+import creditLineRoutes from './creditLineRoutes.js';
+import creditLineTypeRoutes from './creditLineTypeRoutes.js';
+import creditLineAmountTypeRoutes from './creditLineAmountTypeRoutes.js';
 import backupRoutes from './backupRoutes.js';
 import attachmentRoutes from './attachmentRoutes.js';
 
@@ -28,6 +31,9 @@ router.use('/banks', bankRoutes);
 router.use('/bank-accounts', bankAccountRoutes);
 router.use('/loans', loanRoutes);
 router.use('/loan-installments', loanInstallmentRoutes);
+router.use('/credit-lines', creditLineRoutes);
+router.use('/credit-line-types', creditLineTypeRoutes);
+router.use('/credit-line-amount-types', creditLineAmountTypeRoutes);
 router.use('/admin/backups', backupRoutes);
 router.use('/attachments', attachmentRoutes);
 

@@ -1,6 +1,7 @@
 import { Bank } from '../models/Bank.js';
 import { BankAccount } from '../models/BankAccount.js';
 import { Loan } from '../models/Loan.js';
+import { CreditLine } from '../models/CreditLine.js';
 import { createCrudHandlers } from '../utils/crudFactory.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -12,18 +13,20 @@ export const getBank = handlers.getOne;
 export const createBank = handlers.create;
 export const updateBank = handlers.update;
 
-// Cancellazione con controllo: una banca referenziata da conti correnti o
-// mutui esistenti non può essere eliminata (evita riferimenti orfani).
+// Cancellazione con controllo: una banca referenziata da conti correnti,
+// mutui o affidamenti esistenti non può essere eliminata (evita riferimenti
+// orfani).
 export const deleteBank = asyncHandler(async (req, res) => {
-  const [usedByAccounts, usedByLoans] = await Promise.all([
+  const [usedByAccounts, usedByLoans, usedByCreditLines] = await Promise.all([
     BankAccount.exists({ bankId: req.params.id }),
     Loan.exists({ bankId: req.params.id }),
+    CreditLine.exists({ bankId: req.params.id }),
   ]);
 
-  if (usedByAccounts || usedByLoans) {
+  if (usedByAccounts || usedByLoans || usedByCreditLines) {
     throw new ApiError(
       409,
-      'Impossibile eliminare: la banca è utilizzata da uno o più conti correnti o mutui'
+      'Impossibile eliminare: la banca è utilizzata da uno o più conti correnti, mutui o affidamenti'
     );
   }
 

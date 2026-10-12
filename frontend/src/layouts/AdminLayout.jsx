@@ -23,6 +23,11 @@ const MUTUI_ITEMS = [
   { to: '/admin/loan-installments', label: 'Rate mutuo' },
 ];
 
+const AFFIDAMENTI_ITEMS = [
+  { to: '/admin/credit-lines', label: 'Affidamenti' },
+  { to: '/admin/credit-line-types', label: 'Tipi di affidamento' },
+];
+
 const AMMINISTRAZIONE_ITEMS = [{ to: '/admin/import-export', label: 'Import/Export' }];
 
 export default function AdminLayout() {
@@ -42,6 +47,7 @@ export default function AdminLayout() {
             </NavLink>
             <NavDropdown label="Anagrafiche" items={ANAGRAFICHE_ITEMS} />
             <NavDropdown label="Mutui" items={MUTUI_ITEMS} />
+            <NavDropdown label="Affidamenti" items={AFFIDAMENTI_ITEMS} />
             <NavDropdown label="Amministrazione" items={AMMINISTRAZIONE_ITEMS} />
           </nav>
         </div>

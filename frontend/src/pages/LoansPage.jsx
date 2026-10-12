@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import ResourcePage from '../components/ResourcePage.jsx';
+import CustomerAutocomplete from '../components/CustomerAutocomplete.jsx';
 import LoanFormWithTabs from '../features/loans/LoanFormWithTabs.jsx';
 import { loansApi } from '../features/loans/loansApi.js';
 import { customersApi } from '../features/customers/customersApi.js';
@@ -10,11 +11,22 @@ import { formatCurrency } from '../lib/format.js';
 
 export default function LoansPage() {
   const isAdmin = useAuthStore((state) => state.user?.role === 'administrator');
-  const [searchParams] = useSearchParams();
-  // Es. /admin/loans?customerId=... (link da StatTile nella scheda cliente):
+  const [searchParams, setSearchParams] = useSearchParams();
+  // Es. /admin/loans?customerId=... (link da StatTile nella scheda cliente,
+  // oppure selezione dalla tendina con completamento automatico qui sotto):
   // per il customer il backend scopera comunque solo i propri mutui, quindi
   // qui il filtro ha effetto solo per l'amministratore.
   const customerIdFilter = searchParams.get('customerId') ?? undefined;
+
+  const handleCustomerFilterChange = (customerId) => {
+    const next = new URLSearchParams(searchParams);
+    if (customerId) {
+      next.set('customerId', customerId);
+    } else {
+      next.delete('customerId');
+    }
+    setSearchParams(next);
+  };
   // Es. /admin/loans?edit=... (link "N." nello scadenzario mutui): apre
   // direttamente la modale di modifica per quel mutuo, vedi ResourcePage.
   const editId = searchParams.get('edit') ?? undefined;
@@ -53,20 +65,17 @@ export default function LoansPage() {
     });
   }
 
-  const filteredCustomerName =
-    isAdmin && customerIdFilter
-      ? (customers?.find((c) => c._id === customerIdFilter)?.companyName ?? customerIdFilter)
-      : null;
-
   return (
     <div className="flex flex-col gap-4">
-      {filteredCustomerName && (
-        <p className="text-sm text-text">
-          Filtrato per cliente: <strong>{filteredCustomerName}</strong> —{' '}
-          <Link to="/admin/loans" className="font-medium text-primary hover:text-primary-600">
-            mostra tutti
-          </Link>
-        </p>
+      {isAdmin && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-text-dark">Filtra per cliente:</span>
+          <CustomerAutocomplete
+            customers={customers ?? []}
+            value={customerIdFilter}
+            onChange={handleCustomerFilterChange}
+          />
+        </div>
       )}
 
       <ResourcePage

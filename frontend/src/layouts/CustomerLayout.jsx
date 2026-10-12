@@ -38,6 +38,9 @@ export default function CustomerLayout() {
             <NavLink to="/customer/loan-installments" className={navLinkClass}>
               Rate mutuo
             </NavLink>
+            <NavLink to="/customer/credit-lines" className={navLinkClass}>
+              Affidamenti
+            </NavLink>
           </nav>
         </div>
         <div className="flex items-center gap-4">

@@ -5,6 +5,7 @@ import { EmailAddress } from '../models/EmailAddress.js';
 import { BankAccount } from '../models/BankAccount.js';
 import { Loan } from '../models/Loan.js';
 import { LoanInstallment } from '../models/LoanInstallment.js';
+import { CreditLine } from '../models/CreditLine.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { deleteAttachmentsFor } from '../services/attachmentService.js';
@@ -78,6 +79,7 @@ export const deleteCustomer = asyncHandler(async (req, res) => {
     BankAccount.deleteMany({ customerId: item._id }),
     Loan.deleteMany({ customerId: item._id }),
     LoanInstallment.deleteMany({ loanId: { $in: loanIds } }),
+    CreditLine.deleteMany({ customerId: item._id }),
     deleteAttachmentsFor('Customer', item._id),
   ]);
 
