@@ -12,6 +12,11 @@ CMD ["npm", "run", "dev", "--", "--host"]
 
 # --- Stage: build (bundle statico di produzione) ---
 FROM base AS build
+# Vite "incorpora" le variabili VITE_* nel bundle al momento della build, non
+# a runtime: .env è escluso dal contesto Docker (.dockerignore), quindi deve
+# arrivare come build arg (vedi docker-compose.prod.yml: build.args).
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
 RUN npm install
 COPY . .
 RUN npm run build

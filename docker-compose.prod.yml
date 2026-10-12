@@ -1,0 +1,68 @@
+# Compose di produzione: niente bind mount del sorgente, niente volume
+# persistente su node_modules (è la causa dei problemi di dipendenze
+# "invisibili" dopo un rebuild che abbiamo risolto nel compose di sviluppo).
+# Le immagini sono costruite usando lo stage "production" dei rispettivi
+# Dockerfile: backend = node + dipendenze di sola produzione (npm ci
+# --omit=dev), frontend = bundle statico servito da nginx. Ogni rebuild parte
+# da un'immagine pulita, senza stato residuo da rebuild precedenti.
+#
+# Variabili d'ambiente: vedi .env.production (template, non versionato) —
+# incollane il contenuto nella sezione "Environment" dell'app su Dokploy.
+services:
+  mongodb:
+    image: mongo:7
+    container_name: bmcons-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?Imposta MONGO_ROOT_PASSWORD nell'Environment di Dokploy}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME:-bmcons}
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      target: production
+    container_name: bmcons-backend
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    env_file:
+      - ./.env
+    environment:
+      # Sovrascrive il MONGO_URI del .env componendolo dalle stesse
+      # credenziali di mongodb qui sopra, come nel compose di sviluppo.
+      MONGO_URI: mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:?Imposta MONGO_ROOT_PASSWORD nell'Environment di Dokploy}@mongodb:27017/${MONGO_DB_NAME:-bmcons}?authSource=admin
+    volumes:
+      # Gli allegati (backend/uploads) sono esclusi dall'immagine
+      # (.dockerignore): senza un volume persistente, ogni redeploy
+      # cancellerebbe i file già caricati lasciando record orfani su DB.
+      - backend-uploads:/app/uploads
+    ports:
+      - "${BACKEND_PORT:-4000}:4000"
+
+  frontend:
+    build:
+      context: ./frontend
+      target: production
+      args:
+        # Vite lo incorpora nel bundle al momento di questa build: deve
+        # essere già il dominio pubblico reale (vedi .env.production).
+        VITE_API_URL: ${VITE_API_URL:?Imposta VITE_API_URL (URL pubblico reale delle API) nell'Environment di Dokploy}
+    container_name: bmcons-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+
+volumes:
+  mongo-data:
+  backend-uploads:
